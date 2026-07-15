@@ -16,7 +16,7 @@ public class GUI {
         JButton AddTracksMenuButton = new JButton("Add Tracks");
 
         AddTracksMenuButton.addActionListener(e -> {
-            GUI.AddTracksMenu(topPanel, bottomPanel, frame, Tracks);
+            LapCountMenu(topPanel, bottomPanel, frame, Tracks);
 
         });
 
@@ -24,15 +24,13 @@ public class GUI {
         JButton OptimalButton = new JButton("Optimal");
 
         OptimalButton.addActionListener(e -> {
-            GUI.OptMenu(topPanel, bottomPanel, frame, Tracks);
-
+            OptMenu(topPanel, bottomPanel, frame, Tracks);
         });
 
         JButton DeleteTracksMenuButton = new JButton("Delete Tracks");
 
         DeleteTracksMenuButton.addActionListener(e -> {
-            GUI.DeleteTracksMenu(topPanel, bottomPanel, frame, Tracks);
-
+            DeleteTracksMenu(topPanel, bottomPanel, frame, Tracks);
         });
 
         bottomPanel.add(OptimalButton);
@@ -164,7 +162,42 @@ public class GUI {
         frame.repaint();
     }
 
-    public static void AddTracksMenu(JPanel topPanel, JPanel bottomPanel, JFrame frame, HashMap<String, Main.Track> Tracks){
+    public static void LapCountMenu(JPanel topPanel, JPanel bottomPanel, JFrame frame, HashMap<String, Main.Track> Tracks){
+        try {
+            frame.remove(topPanel);
+            frame.remove(bottomPanel);
+        } catch (Exception ignored) {}
+
+        topPanel.removeAll();
+        bottomPanel.removeAll();
+
+        JTextField lapCountEntry = new JTextField(5);
+        JLabel lapCountLabel = new JLabel("How many laps per compound? ");
+        topPanel.add(lapCountLabel);
+        topPanel.add(lapCountEntry);
+
+        JButton submit = new JButton("Submit");
+        submit.addActionListener(e -> {
+            AddTracksMenu(topPanel, bottomPanel, frame, Tracks, Integer.parseInt(lapCountEntry.getText()));
+        });
+        bottomPanel.add(submit);
+
+
+
+        JButton Back = new JButton("Back");
+        Back.addActionListener(e -> {
+            MainMenu(topPanel, bottomPanel, frame, Tracks);
+        });
+        bottomPanel.add(Back);
+
+        frame.add(bottomPanel);
+        frame.add(topPanel);
+
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    public static void AddTracksMenu(JPanel topPanel, JPanel bottomPanel, JFrame frame, HashMap<String, Main.Track> Tracks, int lapCount){
 
         topPanel.removeAll();
         bottomPanel.removeAll();
@@ -172,7 +205,7 @@ public class GUI {
 
         ArrayList<JPanel> MIDs = new ArrayList<>();
         for (int i=0; i<8; i++){
-            MIDs.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            MIDs.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
         }
 
 
@@ -183,7 +216,7 @@ public class GUI {
         Compounds.add("medium");
         Compounds.add("hard");
 
-        int lapCount = 25;
+
         HashMap<String, ArrayList<JTextField>> LapEntries = new HashMap<>();
 
         for (String compound : Compounds){
@@ -195,7 +228,7 @@ public class GUI {
         }
 
 
-        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        topPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         topPanel.add(new JLabel("soft Laptimes: "));
         for (int i = 0; i < lapCount; i++){
             topPanel.add(LapEntries.get("soft").get(i));
@@ -305,7 +338,7 @@ public class GUI {
 
                 // FIX 1: Safely push UI instantiation/refresh back to the Swing EDT
                 SwingUtilities.invokeLater(() -> {
-                    AddTracksMenu(topPanel, bottomPanel, frame, TracksNew);
+                    AddTracksMenu(topPanel, bottomPanel, frame, TracksNew, lapCount);
                 });
             });
 
@@ -328,7 +361,7 @@ public class GUI {
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
-            MainMenu(topPanel, bottomPanel, frame, Tracks);
+            LapCountMenu(topPanel, bottomPanel, frame, Tracks);
         });
 
         bottomPanel.add(Back);
